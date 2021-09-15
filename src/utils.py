@@ -87,7 +87,7 @@ class EarlyStopping:
             self.val_acc_max = values
 
 
-def preprocess(data_dir, csv_dir,train_val_split=0.3,train_val_split_status=False):
+def preprocess(data_dir, csv_dir,train_val_split=0.3,train_val_split_status=False,custom_val=False):
     """
     Get training dataframe and testing dataframe from image directory and
     csv description file.
@@ -124,7 +124,39 @@ def preprocess(data_dir, csv_dir,train_val_split=0.3,train_val_split_status=Fals
         df_test = pd.DataFrame(data_test)
 
         return df_train, df_test
-    if train_val_split_status == False:
+    elif custom_val:
+        df_0 = url_dataframe.groupby('target').get_group(0)
+        df_1 = url_dataframe.groupby('target').get_group(1)
+
+        df_0_train,df_0_test = train_test_split(df_0,test_size=0.1,random_state=15)
+        df_1_train,df_1_test = train_test_split(df_1,test_size=0.2,random_state=15)
+
+        df_train = pd.concat([df_0_train,df_1_train])
+        df_test = pd.concat([df_0_test,df_1_test])
+
+
+        train_target = df_train['target']
+        test_target = df_test['target']
+        train_data = df_train['image_name']
+        test_data = df_test['image_name']
+
+        data_train = {'Name': train_data,
+                    'Label': train_target
+                    }
+
+        data_test = {'Name': test_data,
+                    'Label': test_target
+                    }
+
+        df_train = pd.DataFrame(data_train)
+        df_test = pd.DataFrame(data_test)
+
+        return df_train, df_test
+        # df_train = pd.concat([df_0_train,df_1_train])
+
+
+
+    else: 
         data = {'Name': total_name,
                     'Label': total_label} 
 
@@ -191,6 +223,6 @@ def calculate_metrics(out_gt, out_pred):
 
 
 if __name__ == '__main__':
-    df_train,df_test = preprocess('/mnt/data_lab513/dhsang/data/256x256', '../csvFile/train.csv',train_val_split_status=True)
+    df_train,df_test = preprocess('/mnt/data_lab513/dhsang/data/256x256', '../csvFile/train.csv',train_val_split_status=False,custom_val=True)
     print(df_train.head())
     print(df_test.head())

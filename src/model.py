@@ -80,7 +80,7 @@ class NeuralNetwork(nn.Module):
             
             # self.softmax = torch.nn.LogSoftmax(dim=1)
             self.pretrained_block._fc = nn.Sequential(nn.Linear(num_features,2))
-            self.softmax = torch.nn.Softmax()
+            self.softmax = torch.nn.LogSoftmax(dim=1)
 
     def forward(self, x):
         """

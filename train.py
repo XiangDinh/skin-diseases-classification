@@ -71,7 +71,7 @@ def train():
                 best_model = True
                 )
         
-        # if ((epoch+1)%3 == 0):
+        # if (epoch != 0):
         #     if diff < 0.8:
         #         diff += 0.1
         #     # Set up DataLoader

@@ -80,16 +80,16 @@ class CustomTrainer(Trainer):
                     self.initial_label_train = torch.FloatTensor().to(self.device)
                     self.initial_label_test = torch.FloatTensor().to(self.device)
                     
-                    self.df_train = preprocess(self.DATA_DIR, self.CSV_DIR_TRAIN,train_val_split=self.TRAIN_VAL_SPLIT,train_val_split_status=self.TRAIN_VAL_SPLIT_STATUS)           
-                    initial_data = DataGenerator(self.df_train,self.DATA_DIR,train=True)
-                    self.initial_img_train,self.initial_label_train = initial_data()
-                    torch.save(self.initial_img_train,'img/initial_img_train.pt')
-                    torch.save(self.initial_label_train,'img/initial_label_train.pt')
+                    self.df_train, self.df_test = preprocess(self.DATA_DIR, self.CSV_DIR_TRAIN,train_val_split=self.TRAIN_VAL_SPLIT,train_val_split_status=self.TRAIN_VAL_SPLIT_STATUS,custom_val=True)           
+                    # initial_data = DataGenerator(self.df_train,self.DATA_DIR,agu=True)
+                    # self.initial_img_train,self.initial_label_train = initial_data()
+                    # torch.save(self.initial_img_train,self.VAR_DIR+'/initial_img_train.pt')
+                    # torch.save(self.initial_label_train,self.VAR_DIR+'/initial_label_train.pt')
                     
-                    initial_data = DataGenerator(self.df_test,self.DATA_DIR,train=False)
+                    initial_data = DataGenerator(self.df_test,self.DATA_DIR,agu=False)
                     self.initial_img_test,self.initial_label_test = initial_data()
-                    torch.save(self.initial_img_test,'img/initial_img_test.pt')
-                    torch.save(self.initial_label_test,'img/initial_label_test.pt')
+                    torch.save(self.initial_img_test,self.VAR_DIR+'/initial_img_test.pt')
+                    torch.save(self.initial_label_test,self.VAR_DIR+'/initial_label_test.pt')
                     print('DONE!!! SAVED TRANSFORMED IMAGE')
                     print("--- {:.0f} seconds ---".format(time.time() - start_time))
                     print('PLZ!! TURN OFF TRASFORM_IMAGE mode in config.json')
@@ -101,10 +101,11 @@ class CustomTrainer(Trainer):
                     self.initial_label_train = torch.FloatTensor().to(self.device)
                     self.initial_label_test = torch.FloatTensor().to(self.device)
 
-                    self.initial_img_train = torch.load('img/initial_img_train.pt')
-                    self.initial_img_test = torch.load('img/initial_img_test.pt')
-                    self.initial_label_train = torch.load('img/initial_label_train.pt')
-                    self.initial_label_test = torch.load('img/initial_label_test.pt')
+                    self.initial_img_train = torch.load(self.VAR_DIR+'/initial_img_train.pt')
+                    self.initial_img_test = torch.load(self.VAR_DIR+'/initial_img_test.pt')
+                    self.initial_label_train = torch.load(self.VAR_DIR+'/initial_label_train.pt')
+                    self.initial_label_test = torch.load(self.VAR_DIR+'/initial_label_test.pt')
+
     
             else:
                 if self.TRANSFORM_IMAGE:
@@ -128,7 +129,10 @@ class CustomTrainer(Trainer):
             self.best_acc_val = 0
             self.best_loss_val = 0
             self.start_time = 0
-            self.path = os.path.join(self.MODEL_DIR, "trial-" + self.TRIAL + ".pth")
+            self.path = os.path.join(self.MODEL_DIR, "trial-" + self.TRIAL + 
+                "-model-" + self.ARCHITECTURE + 
+            "-optim-" + self.OPTIMIZER + 
+            "-lr-" + str(self.LEARNING_RATE) + ".pth")
             # Initiate early stoppping object
             self.early_stopping=EarlyStopping(verbose=True, patience=self.PATIENCE, path= self.path, monitor=self.EARLY_STOPING)
             self.writer = SummaryWriter(
@@ -353,7 +357,7 @@ class CustomTrainer(Trainer):
     def early_stop(self):
         return self.early_stopping.early_stop
 
-    def setup_training_data(self,diff=0):
+    def setup_training_data(self,diff=False):
         """
         Setup training data. Return data loaders of test and train set
         for training preparation.
@@ -372,14 +376,17 @@ class CustomTrainer(Trainer):
                 self.initial_label_train,
                 transform=None,
                 target_transform=None,
-                diff=diff)
+                diff=True,
+                train=True)
 
 
             test_dataset = CustomImageDataset(
                 self.initial_img_test,
                 self.initial_label_test,
                 transform=None,
-                target_transform=None,
+                target_transform=Lambda(
+                    lambda y: torch.tensor(y).type(
+                        torch.long)),
                         diff=0)
 
             # Create data loader objects for train and test dataset objects

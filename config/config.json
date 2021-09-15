@@ -12,15 +12,15 @@
 	"EARLY_STOPING": "val_accuracy",
 	"PATIENCE": 10,
 
-	"TRAIN_VAL_SPLIT_STATUS": true,
+	"TRAIN_VAL_SPLIT_STATUS": false,
 	"TRAIN_VAL_SPLIT": 0.3,
 
-	"VAL_MODE": false,
+	"VAL_MODE": true,
 	"PREDICT_MODE": false,
 	
 	"TRANSFORM_IMAGE":false,
 
-	"TRIAL": "ef-1",
+	"TRIAL": "ef-7-trans-nol-imp",
 	"ARCHITECTURE": "efficientnet_b0",
 	"LEARNING_RATE": 0.001,
 	"OPTIMIZER": "adam"
