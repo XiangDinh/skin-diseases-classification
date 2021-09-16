@@ -215,7 +215,7 @@ class CustomTrainer(Trainer):
             if self.EARLY_STOPING == 'val_loss':
                 value=train_loss / (batch + 1)
             elif self.EARLY_STOPING == 'val_accuracy':
-                value=correct / len(dataloader.dataset)
+                value= accuracy
             else: 
                 value = None
             
@@ -436,7 +436,7 @@ class CustomTrainer(Trainer):
         # Optimizers
         if self.OPTIMIZER.lower() == "adam":
             optimizer = torch.optim.Adam(
-                model.parameters(), lr=self.LEARNING_RATE)
+                model.parameters(), lr=self.LEARNING_RATE,weight_decay=self.WEIGHDECAY)
         else:
             optimizer = torch.optim.SGD(
                 model.parameters(), lr=self.LEARNING_RATE)
@@ -445,13 +445,13 @@ class CustomTrainer(Trainer):
         if torch.cuda.device_count() > 1:
             device = "cuda:0" if torch.cuda.is_available() else "cpu"
             print("Let's use", torch.cuda.device_count(), "GPUs!")
-            model = nn.DataParallel(model)
+            model = nn.DataParallel(model,device_ids=[0,1])
             model.to(device)
         else:
             device = "cuda" if torch.cuda.is_available() else "cpu"
             model.to(device)
 
-        loss_fn = nn.CrossEntropyLoss().to(device)
+        loss_fn = nn.CrossEntropyLoss(reduction="sum").to(device)
 
         print("Using architecture: " + self.ARCHITECTURE + " with optimizer: " +
                 self.OPTIMIZER + " and learning rate: " + str(self.LEARNING_RATE))

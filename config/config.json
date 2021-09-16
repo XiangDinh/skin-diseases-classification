@@ -6,11 +6,11 @@
 	"CSV_DIR_TRAIN": "csvFile/train.csv",
 	"CSV_DIR_TEST": "csvFile/test.csv",
 	
-	"EPOCHS": 10,
-	"BATCH_SIZE": 64,
+	"EPOCHS": 20,
+	"BATCH_SIZE": 100,
 	
 	"EARLY_STOPING": "val_accuracy",
-	"PATIENCE": 10,
+	"PATIENCE": 5,
 
 	"TRAIN_VAL_SPLIT_STATUS": false,
 	"TRAIN_VAL_SPLIT": 0.3,
@@ -20,8 +20,9 @@
 	
 	"TRANSFORM_IMAGE":false,
 
-	"TRIAL": "ef-7-trans-nol-imp",
-	"ARCHITECTURE": "efficientnet_b0",
+	"TRIAL": "resnet50-1-drop-trans-nol-imp",
+	"ARCHITECTURE": "resnet50",
 	"LEARNING_RATE": 0.001,
-	"OPTIMIZER": "adam"
+	"OPTIMIZER": "adam",
+	"WEIGHDECAY": 0
 }

@@ -56,8 +56,8 @@ def train():
                 loss_fn,
                 device,
                 epoch,
-                use_checkpoint = False,
-                best_model=True
+                use_checkpoint = True,
+                best_model=False
                 )
         else:
             trainer.epoch_train(
