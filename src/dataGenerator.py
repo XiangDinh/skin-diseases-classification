@@ -1,5 +1,6 @@
 import torch
 from torchvision.io import read_image
+from tqdm import tqdm
 import os,sys
 import torchvision.transforms as T
 from torchvision.transforms.transforms import ConvertImageDtype
@@ -29,15 +30,12 @@ class DataGenerator:
         return len(self.img_labels)
 
     def __call__(self):
-        image = torch.FloatTensor().to(self.device)
-        for idx in range(len(self.img_labels)):
-            img_path = os.path.join(self.img_dir, self.img_labels.iloc[idx,0])
-            image = read_image(img_path)
+        for idx in tqdm(range((len(self.img_labels)))):
+            image = os.path.join(self.img_dir, self.img_labels.iloc[idx,0])
+            # image = read_image(img_path)
 
-            # image = self.transform_1(image)
             label = self.img_labels.iloc[idx, 1]
 
-            # image = self.transform_1(image)
             self.agu_img.append(image)
             self.agu_label.append(label)
             
@@ -46,10 +44,9 @@ class DataGenerator:
                 self.agu_label.append(label)
                 self.agu_img.append(image)
                 self.agu_label.append(label)
-                self.agu_img.append(image)
-                self.agu_label.append(label)
+                # self.agu_img.append(image)
+                # self.agu_label.append(label)
 
-        print(len(self.agu_label))
         return self.agu_img, self.agu_label
 
 if __name__ == '__main__':

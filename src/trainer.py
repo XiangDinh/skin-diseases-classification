@@ -74,17 +74,12 @@ class CustomTrainer(Trainer):
             elif self.VAL_MODE:
                 if self.TRANSFORM_IMAGE:
                     start_time = time.time()
-                    self.device = "cuda" if torch.cuda.is_available() else "cpu"
-                    self.initial_img_train = torch.FloatTensor().to(self.device)
-                    self.initial_img_test = torch.FloatTensor().to(self.device)
-                    self.initial_label_train = torch.FloatTensor().to(self.device)
-                    self.initial_label_test = torch.FloatTensor().to(self.device)
                     
-                    self.df_train, self.df_test = preprocess(self.DATA_DIR, self.CSV_DIR_TRAIN,train_val_split=self.TRAIN_VAL_SPLIT,train_val_split_status=self.TRAIN_VAL_SPLIT_STATUS,custom_val=True)           
-                    # initial_data = DataGenerator(self.df_train,self.DATA_DIR,agu=True)
-                    # self.initial_img_train,self.initial_label_train = initial_data()
-                    # torch.save(self.initial_img_train,self.VAR_DIR+'/initial_img_train.pt')
-                    # torch.save(self.initial_label_train,self.VAR_DIR+'/initial_label_train.pt')
+                    self.df_train, self.df_test = preprocess(self.DATA_DIR, self.CSV_DIR_TRAIN,train_val_split=self.TRAIN_VAL_SPLIT,train_val_split_status=self.TRAIN_VAL_SPLIT_STATUS,custom_val=True,train_ignore=self.TRAIN_IGNORE)           
+                    initial_data = DataGenerator(self.df_train,self.DATA_DIR,agu=True)
+                    self.initial_img_train,self.initial_label_train = initial_data()
+                    torch.save(self.initial_img_train,self.VAR_DIR+'/initial_img_train.pt')
+                    torch.save(self.initial_label_train,self.VAR_DIR+'/initial_label_train.pt')
                     
                     initial_data = DataGenerator(self.df_test,self.DATA_DIR,agu=False)
                     self.initial_img_test,self.initial_label_test = initial_data()
@@ -132,7 +127,7 @@ class CustomTrainer(Trainer):
             self.path = os.path.join(self.MODEL_DIR, "trial-" + self.TRIAL + 
                 "-model-" + self.ARCHITECTURE + 
             "-optim-" + self.OPTIMIZER + 
-            "-lr-" + str(self.LEARNING_RATE) + ".pth")
+            "-lr-" + str(self.LEARNING_RATE) + "-wc-" + str(self.WEIGHDECAY) + ".pth")
             # Initiate early stoppping object
             self.early_stopping=EarlyStopping(verbose=True, patience=self.PATIENCE, path= self.path, monitor=self.EARLY_STOPING)
             self.writer = SummaryWriter(
@@ -141,7 +136,8 @@ class CustomTrainer(Trainer):
                     "trial-" + self.TRIAL +
                     "-model-" + self.ARCHITECTURE +
                     "-optim-" + self.OPTIMIZER +
-                    "-lr-" + str(self.LEARNING_RATE)))
+                    "-lr-" + str(self.LEARNING_RATE) +
+                    "-wc-" + str(self.WEIGHDECAY)))
 
     def epoch_train(self, dataloader, model, loss_fn, optimizer, device, epoch,use_checkpoint=False,best_model=False):
         """
@@ -387,7 +383,7 @@ class CustomTrainer(Trainer):
                 target_transform=Lambda(
                     lambda y: torch.tensor(y).type(
                         torch.long)),
-                        diff=0)
+                        diff=False)
 
             # Create data loader objects for train and test dataset objects
             train_dataloader = DataLoader(

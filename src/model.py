@@ -17,18 +17,13 @@ class NeuralNetwork(nn.Module):
         self.model_type = model_type.lower()
 
         if self.model_type == 'resnet18':
-            # Get pretrained model
             self.pretrained_block = models.resnet18(
                 pretrained=True, progress=True)
-
-            # Finetune the last layer for binary classification
             num_features = self.pretrained_block.fc.in_features
-            # self.pretrained_block.fc = torch.nn.Linear(num_features, 7)
             self.pretrained_block.fc = nn.Sequential(nn.Dropout(p=0.5,inplace=True),nn.Linear(num_features,2))
-            self.softmax = torch.nn.Softmax()
+            self.softmax = torch.nn.LogSoftmax()
 
         if self.model_type == 'resnet34':
-            # Get pretrained model
             self.pretrained_block = models.resnet34(
                 pretrained=True, progress=True)
 
@@ -36,71 +31,47 @@ class NeuralNetwork(nn.Module):
             num_features = self.pretrained_block.fc.in_features
             # self.pretrained_block.fc = torch.nn.Linear(num_features, 7)
             self.pretrained_block.fc = nn.Sequential(nn.Dropout(p=0.5,inplace=True),nn.Linear(num_features,2))
-            self.softmax = torch.nn.Softmax()
+            self.softmax = torch.nn.LogSoftmax()
 
         if self.model_type == 'resnet50':
-            # Get pretrained model
             self.pretrained_block = models.resnet50(
                 pretrained=True, progress=True)
-            # Finetune the last layer for binary classification
-
             num_features = self.pretrained_block.fc.in_features
-            # self.pretrained_block.fc = torch.nn.Linear(num_features, 7)
             self.pretrained_block.fc = nn.Sequential(nn.Dropout(p=0.5,inplace=True),nn.Linear(num_features,2))
-            self.softmax = torch.nn.Softmax()
+            self.softmax = torch.nn.LogSoftmax()
 
         if self.model_type == 'vgg16':
             self.pretrained_block = models.vgg16(
                 pretrained=True, progress=True)
             num_features = self.pretrained_block.classifier[6].in_features
             self.pretrained_block.classifier[6] = torch.nn.Linear(
-                num_features, 7)
-            self.softmax = torch.nn.Sigmoid()
+                num_features, 2)
+            self.softmax = torch.nn.LogSigmoid()
 
         if self.model_type == 'alexnet':
             self.pretrained_block = models.alexnet(
                 pretrained=True, progress=True)
             num_features = self.pretrained_block.classifier[6].in_features
             self.pretrained_block.classifier[6] = torch.nn.Linear(
-                num_features, 3)
+                num_features, 2)
             self.softmax = torch.nn.LogSoftmax(dim=1)
 
         if self.model_type == 'densenet121':
             self.pretrained_block = models.densenet121(
                 pretrained=True, progress=True)
             num_features = self.pretrained_block.fc.in_features
-            self.pretrained_block.fc = torch.nn.Linear(num_features, 3)
+            self.pretrained_block.fc = torch.nn.Linear(num_features, 2)
             self.softmax = torch.nn.LogSoftmax(dim=1)
         
         if self.model_type == 'efficientnet_b0':
-            self.pretrained_block = EfficientNet.from_pretrained('efficientnet-b0') #EfficientNet.from_name('efficientnet-b0')
+            self.pretrained_block = EfficientNet.from_pretrained('efficientnet-b0',num_classes=2) #EfficientNet.from_name('efficientnet-b0')
             num_features = self.pretrained_block._fc.in_features
-            # self.pretrained_block._dropout = torch.nn.Dropout(p=0.2,inplace=True)     
-            # self.pretrained_block._fc = nn.Sequential(nn.Linear(num_features,512),
-            #                                                                     nn.ReLU(),
-            #                                                                     nn.Dropout(p=0.25,inplace=True),
-            #                                                                     nn.Linear(512,128),
-            #                                                                     nn.ReLU(),
-            #                                                                     nn.Dropout(p=0.5,inplace=True),
-            #                                                                     nn.Linear(128,7))
-            
-            # self.softmax = torch.nn.LogSoftmax(dim=1)
-            self.pretrained_block._fc = torch.nn.Linear(num_features,2)
+            self.pretrained_block._dropout = torch.nn.Dropout(p=0.5,inplace=True)     
             self.softmax = torch.nn.LogSoftmax(dim=1)
         
         if self.model_type == 'efficientnet_b1':
             self.pretrained_block = EfficientNet.from_pretrained('efficientnet-b1') #EfficientNet.from_name('efficientnet-b0')
             num_features = self.pretrained_block._fc.in_features
-            # self.pretrained_block._dropout = torch.nn.Dropout(p=0.2,inplace=True)     
-            # self.pretrained_block._fc = nn.Sequential(nn.Linear(num_features,512),
-            #                                                                     nn.ReLU(),
-            #                                                                     nn.Dropout(p=0.25,inplace=True),
-            #                                                                     nn.Linear(512,128),
-            #                                                                     nn.ReLU(),
-            #                                                                     nn.Dropout(p=0.5,inplace=True),
-            #                                                                     nn.Linear(128,7))
-            
-            # self.softmax = torch.nn.LogSoftmax(dim=1)
             self.pretrained_block._fc = torch.nn.Linear(num_features,2)
             self.softmax = torch.nn.LogSoftmax(dim=1)
 
@@ -123,5 +94,5 @@ class NeuralNetwork(nn.Module):
 
 
 if __name__ == '__main__':
-    trial_model = NeuralNetwork('resnet18')  # resnet18 #vgg16
+    trial_model = NeuralNetwork('densenet121')  # resnet18 #vgg16
     print(trial_model)

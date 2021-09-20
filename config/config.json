@@ -2,12 +2,14 @@
 	"DATA_DIR": "/mnt/data_lab513/dhsang/data/256x256",
 	"VAR_DIR": "/mnt/data_lab513/dhsang/data/var_256",
 	"MODEL_DIR": "/mnt/data_lab513/dhsang/data/models_256",
+
 	"PREDICT_IMAGE_PATH": "",
 	"CSV_DIR_TRAIN": "csvFile/train.csv",
 	"CSV_DIR_TEST": "csvFile/test.csv",
 	
-	"EPOCHS": 20,
-	"BATCH_SIZE": 100,
+	"EPOCHS": 30,
+	"BATCH_SIZE": 90,
+	"TRAIN_IGNORE": 0.8,
 	
 	"EARLY_STOPING": "val_accuracy",
 	"PATIENCE": 5,
@@ -20,8 +22,8 @@
 	
 	"TRANSFORM_IMAGE":false,
 
-	"TRIAL": "resnet50-1-drop-trans-nol-imp",
-	"ARCHITECTURE": "resnet50",
+	"TRIAL": "ef-10-drop-trans-nol-imp",
+	"ARCHITECTURE": "efficientnet_b0",
 	"LEARNING_RATE": 0.001,
 	"OPTIMIZER": "adam",
 	"WEIGHDECAY": 0

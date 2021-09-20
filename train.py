@@ -1,5 +1,6 @@
 import torch
 from src.trainer import CustomTrainer
+from src.utils import set_seed
 from src.keyboardinterrupt import keyboardInterruptHandler
 import json,sys,time
 
@@ -24,7 +25,7 @@ def train():
     trainer = CustomTrainer(**params)
 
     # Do kho
-    diff = 0
+    diff = 1
 
     # Set up DataLoader
     if trainer.TRAIN_VAL_SPLIT_STATUS or trainer.VAL_MODE:
@@ -56,8 +57,8 @@ def train():
                 loss_fn,
                 device,
                 epoch,
-                use_checkpoint = True,
-                best_model=False
+                use_checkpoint = False,
+                best_model=True
                 )
         else:
             trainer.epoch_train(
@@ -71,14 +72,9 @@ def train():
                 best_model = True
                 )
         
-        # if (epoch != 0):
-        #     if diff < 0.8:
-        #         diff += 0.1
-        #     # Set up DataLoader
-        #     if trainer.TRAIN_VAL_SPLIT_STATUS or trainer.VAL_MODE:
-        #         train_dataloader, test_dataloader = trainer.setup_training_data(diff=diff)
-        #     else:
-        #         train_dataloader = trainer.setup_training_data(diff=diff)
+        if ((epoch+1) % 3 == 0):
+            diff += 1
+            set_seed(diff) 
 
         if trainer.early_stop():
             print("EARLY STOPING!!!")

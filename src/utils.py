@@ -1,5 +1,5 @@
 import pandas as pd
-import os,sys
+import os,sys,random
 import numpy as np
 import torch
 from sklearn.model_selection import train_test_split
@@ -87,7 +87,7 @@ class EarlyStopping:
             self.val_acc_max = values
 
 
-def preprocess(data_dir, csv_dir,train_val_split=0.3,train_val_split_status=False,custom_val=False):
+def preprocess(data_dir, csv_dir,train_val_split=0.3,train_val_split_status=False,custom_val=False,train_ignore=0.5):
     """
     Get training dataframe and testing dataframe from image directory and
     csv description file.
@@ -128,8 +128,10 @@ def preprocess(data_dir, csv_dir,train_val_split=0.3,train_val_split_status=Fals
         df_0 = url_dataframe.groupby('target').get_group(0)
         df_1 = url_dataframe.groupby('target').get_group(1)
 
-        df_0_train,df_0_test = train_test_split(df_0,test_size=0.1,random_state=15)
-        df_1_train,df_1_test = train_test_split(df_1,test_size=0.2,random_state=15)
+        df_0_train,df_0_test = train_test_split(df_0,test_size=0.05,random_state=107)
+        df_1_train,df_1_test = train_test_split(df_1,test_size=0.1,random_state=107)
+
+        df_0_train,_ = train_test_split(df_0_train,test_size=train_ignore,random_state=167)
 
         df_train = pd.concat([df_0_train,df_1_train])
         df_test = pd.concat([df_0_test,df_1_test])
@@ -221,6 +223,13 @@ def calculate_metrics(out_gt, out_pred):
 
     return accuracy, precision, recall, f1_score, sensitivity, specificity
 
+def set_seed(seed=0):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
 
 if __name__ == '__main__':
     df_train,df_test = preprocess('/mnt/data_lab513/dhsang/data/256x256', '../csvFile/train.csv',train_val_split_status=False,custom_val=True)
